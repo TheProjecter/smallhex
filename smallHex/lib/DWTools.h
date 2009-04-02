@@ -99,27 +99,27 @@ void  _PrintMenu(byte,byte,byte,char**);  // SetX,SetY,Size,Texts
 byte   MenuCycle(byte,byte,byte);
 byte   MenuCycleEx(byte,byte,byte);
 
-// Design
-void   DesingLineX(byte,byte,byte);
-void   DesingLineY(byte,byte,byte);
-void   DesingDLineX(byte,byte,byte);
-void   DesingDLineY(byte,byte,byte);
-void   DesignLineLinkX(byte,byte,byte);
-void   DesignLineDLinkX(byte,byte,byte);
-void   DesignDLineLinkX(byte,byte,byte);
-void   DesignDLineDLinkX(byte,byte,byte);
-void   DesignLineLinkY(byte,byte,byte);
-void   DesignLineDLinkY(byte,byte,byte);
-void   DesignDLineLinkY(byte,byte,byte);
-void   DesignDLineDLinkY(byte,byte,byte);
-void   DesignSquare(byte,byte,byte);
-void   DesignDSquare(byte,byte,byte);
-void   DesignRect(byte,byte,byte,byte);
-void   DesignDRect(byte,byte,byte,byte);
-void   DesignEmptyLineX(byte,byte,byte);
-void   DesignEmptyLineY(byte,byte,byte);
-void   DesignEmptySquare(byte,byte,byte line);
-void   DesignEmptyRect(byte,byte,byte,byte);
+// Draw
+void   DrawLineX(byte,byte,byte);
+void   DrawLineY(byte,byte,byte);
+void   DrawDLineX(byte,byte,byte);
+void   DrawDLineY(byte,byte,byte);
+void   DrawLineLinkX(byte,byte,byte);
+void   DrawLineDLinkX(byte,byte,byte);
+void   DrawDLineLinkX(byte,byte,byte);
+void   DrawDLineDLinkX(byte,byte,byte);
+void   DrawLineLinkY(byte,byte,byte);
+void   DrawLineDLinkY(byte,byte,byte);
+void   DrawDLineLinkY(byte,byte,byte);
+void   DrawDLineDLinkY(byte,byte,byte);
+void   DrawSquare(byte,byte,byte);
+void   DrawDSquare(byte,byte,byte);
+void   DrawRect(byte,byte,byte,byte);
+void   DrawDRect(byte,byte,byte,byte);
+void   DrawEmptyLineX(byte,byte,byte);
+void   DrawEmptyLineY(byte,byte,byte);
+void   DrawEmptySquare(byte,byte,byte line);
+void   DrawEmptyRect(byte,byte,byte,byte);
 
 // Date and Time
 int16  GetDateYear();
