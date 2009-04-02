@@ -23,15 +23,24 @@ BEGIN:
     DrawLineX(1,GetBufferSizeY()-2,GetBufferSizeX()-2);
     Console(0);
 WRITE:
+
     Console(1);
     fseek(file,p,SEEK_SET);
     fread(buf,1,4096,file);
-    for(int y=0;y<23;y++){
-        SetXY(1,y);
-        for(int x=0;x<26;x++){
-            printf("%02X ",buf[x+26*y]);
+    if (displaymode!=2)
+        for(int y=0;y<bufY;y++){  // HEX CODE
+            SetXY(1,y);
+            for(int x=0;x<bufX;x++){
+                printf("%02X ",buf[x+bufX*y]);
+            }
         }
-    }
+    if (displaymode!=1)
+        for(int y=0;y<bufY;y++){  // HEX CODE
+            SetXY(59,y);
+            for(int x=0;x<bufX;x++){
+                printf("%c",buf[x+bufX*y]);
+            }
+        }
     while(1){
         Sleep(1);
 
@@ -44,15 +53,31 @@ WRITE:
             goto WRITE;
         }
         else if (Key(VK_UP)){
-            if (p>26) p-=26;
+            if (p>bufX) p-=bufX;
             else p=0;
             goto WRITE;
         }
         else if (Key(VK_DOWN)){
-            p+=26;
+            p+=bufX;
             goto WRITE;
         }
         else if (Key(ESC))
             exit(0);
+        else if (Key(F5)){
+            switch(displaymode){
+                case 0:
+                    displaymode=1;
+                    bufX=26;
+                    break;
+                case 1:
+                    displaymode=2;
+                    break;
+                case 2:
+                    displaymode=0;
+                    bufX=16;
+                    break;
+            }
+            goto BEGIN;
+        }
     }
 }

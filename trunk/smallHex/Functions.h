@@ -7,6 +7,8 @@
 #define Key(i) GetAsyncKeyState(i)==-32767
 
 int32 p=0,size;
+byte displaymode=0;
+byte bufX=19,bufY=23;
 
 int FileSize(FILE *file){
     fseek(file,0,SEEK_END);
@@ -25,3 +27,5 @@ void Console(int t){
             break;
     }
 }
+
+
