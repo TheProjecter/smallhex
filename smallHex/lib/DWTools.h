@@ -17,6 +17,7 @@ void   cls();
 int    GetTextLong(char *);
 void   printCenter(char *);
 void   printRight(char *,byte);
+bool  *GetBin(byte);
 
 // System
 bool   GetAdminMode();
@@ -153,10 +154,3 @@ int    NCA1(char*);
 int    NCA2(char*);
 int    NCA1File(char*);
 int    NCA2File(char*);
-
-// Classes
-class Binary{
-    public:
-        void set(byte);
-        bool get(byte);
-};

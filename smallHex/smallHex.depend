@@ -1,15 +1,15 @@
 # depslib dependency file v1.0
-1238686049 source:c:\users\administrator\documents\project\smallhex\main.cpp
+1238693978 source:c:\users\administrator\documents\project\smallhex\main.cpp
+	"Functions.h"
+
+1238693057 c:\users\administrator\documents\project\smallhex\lib\dwtools.h
+
+1237714723 c:\users\administrator\documents\project\smallhex\lib\dwtoolsdef.h
+
+1238692907 c:\users\administrator\documents\project\smallhex\functions.h
 	<stdio.h>
 	<stdlib.h>
 	<windows.h>
 	"lib\DWTools.h"
 	"lib\DWToolsDef.h"
-	"Functions.h"
-
-1237591423 c:\users\administrator\documents\project\smallhex\lib\dwtools.h
-
-1237714723 c:\users\administrator\documents\project\smallhex\lib\dwtoolsdef.h
-
-1238686543 c:\users\administrator\documents\project\smallhex\functions.h
 
