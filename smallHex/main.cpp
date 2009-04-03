@@ -23,24 +23,31 @@ BEGIN:
     DrawLineX(1,GetBufferSizeY()-2,GetBufferSizeX()-2);
     Console(0);
 WRITE:
-
     Console(1);
     fseek(file,p,SEEK_SET);
     fread(buf,1,4096,file);
-    if (displaymode!=2)
-        for(int y=0;y<bufY;y++){  // HEX CODE
-            SetXY(1,y);
+    if (displaymode!=2){
+        for(int y=0;y<bufY;y++){  // HEX
+            SetXY(posXH,y);
             for(int x=0;x<bufX;x++){
                 printf("%02X ",buf[x+bufX*y]);
             }
         }
-    if (displaymode!=1)
-        for(int y=0;y<bufY;y++){  // HEX CODE
-            SetXY(59,y);
+        SetXY(posXH,0); SetTextColor(LRED);
+        printf("%02X",buf[0]);
+        SetTextColor(DWHITE);
+    }
+    if (displaymode!=1){
+        for(int y=0;y<bufY;y++){  // CHAR
+            SetXY(posXC,y);
             for(int x=0;x<bufX;x++){
-                printf("%c",buf[x+bufX*y]);
+                Alias(buf[x+bufX*y]);
             }
         }
+        SetXY(posXC,0); SetTextColor(LRED);
+        Alias(buf[0]);
+        SetTextColor(DWHITE);
+    }
     while(1){
         Sleep(1);
 
@@ -61,6 +68,15 @@ WRITE:
             p+=bufX;
             goto WRITE;
         }
+        else if (Key(PAGEUP)){
+            if (p>bufX*bufY) p-=bufX*bufY;
+            else p=0;
+            goto WRITE;
+        }
+        else if (Key(PAGEDWN)){
+            p+=bufX*bufY;
+            goto WRITE;
+        }
         else if (Key(ESC))
             exit(0);
         else if (Key(F5)){
@@ -71,10 +87,13 @@ WRITE:
                     break;
                 case 1:
                     displaymode=2;
+                    bufX=78;
+                    posXC=1;
                     break;
                 case 2:
                     displaymode=0;
-                    bufX=16;
+                    bufX=19;
+                    posXC=59;
                     break;
             }
             goto BEGIN;
