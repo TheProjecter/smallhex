@@ -6,7 +6,7 @@ int main(){
     SetConsoleTitle("smallHex");
     SetCursorVisible(false);
     SetBufferSizeY(25);
-    byte *buf=(byte*)malloc(4096);
+    byte *buf=(byte*)malloc(2048);
     FILE *file;
     char *path;
     #ifdef DEBUG
@@ -25,29 +25,35 @@ BEGIN:
 WRITE:
     Console(1);
     fseek(file,p,SEEK_SET);
-    fread(buf,1,4096,file);
-    if (displaymode!=2){
-        for(int y=0;y<bufY;y++){  // HEX
-            SetXY(posXH,y);
+    fread(buf,1,2048,file);
+
+    for(int y=0;y<bufY;y++){
+        SetXY(posXH,y);
+        if (displaymode!=2){
             for(int x=0;x<bufX;x++){
                 printf("%02X ",buf[x+bufX*y]);
             }
+            printf(" ");
         }
-        SetXY(posXH,0); SetTextColor(LRED);
-        printf("%02X",buf[0]);
-        SetTextColor(DWHITE);
-    }
-    if (displaymode!=1){
-        for(int y=0;y<bufY;y++){  // CHAR
-            SetXY(posXC,y);
+        if (displaymode!=1)
             for(int x=0;x<bufX;x++){
                 Alias(buf[x+bufX*y]);
             }
-        }
-        SetXY(posXC,0); SetTextColor(LRED);
-        Alias(buf[0]);
-        SetTextColor(DWHITE);
     }
+    SetTextColor(LRED);
+    if (displaymode==0||displaymode==1){
+        SetXY(posXH,0); printf("%02X",buf[0]);
+    }
+    if (displaymode==0){
+        SetXY(bufX*3+2,0);
+        Alias(buf[0]);
+    }
+    else if (displaymode==2){
+        SetXY(posXH,0);
+        Alias(buf[0]);
+    }
+    SetTextColor(DWHITE);
+
     while(1){
         Sleep(1);
 
