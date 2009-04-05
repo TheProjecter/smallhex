@@ -6,6 +6,7 @@ int main(){
     SetConsoleTitle("smallHex");
     SetCursorVisible(false);
     SetBufferSizeY(25);
+    register byte ky;
     byte *buf=(byte*)malloc(2048);
     char *path;
     #ifdef DEBUG
@@ -21,7 +22,7 @@ BEGIN:
     cls();
     DrawLineX(1,GetBufferSizeY()-2,GetBufferSizeX()-2);
     Console(0);
-WRITE:
+READ:
     Console(1);
     fseek(file,p,SEEK_SET);
     fread(buf,1,2048,file);
@@ -39,12 +40,29 @@ WRITE:
                 Alias(buf[x+bufX*y]);
             }
     }
-    SetTextColor(LRED);
+    if (0==1){
+WRITE:
+        if (!md){
+            if (!kh)
+                buf[0]=buf[0]-((buf[0]>>4)<<4)+(ky<<4);
+            else
+                buf[0]=((buf[0]>>4)<<4)+ky;
+            kh=!kh;
+        }
+        else {
+            buf[0]=ky;
+        }
+        write(buf[0]);
+    }
+UPDATE:
     if (displaymode==0||displaymode==1){
+        if (!md) SetTextColor(LRED);
         SetXY(posXH,0); printf("%02X",buf[0]);
     }
     if (displaymode==0){
         SetXY(bufX*3+2,0);
+        if (!md) SetTextColor(DWHITE);
+        else SetTextColor(LRED);
         Alias(buf[0]);
     }
     else if (displaymode==2){
@@ -56,35 +74,35 @@ WRITE:
     while(1){
         Sleep(1);
 
-        byte i=KeyX();
-        switch(i){
+        ky=KeyX();
+        switch(ky){
             case VK_LEFT:
                 if (p>0){
                     p--;
-                    goto WRITE;
+                    goto READ;
                 }
                 break;
             case VK_RIGHT:
                 p++;
-                goto WRITE;
+                goto READ;
                 break;
             case VK_UP:
                 if (p>bufX) p-=bufX;
                 else p=0;
-                goto WRITE;
+                goto READ;
                 break;
             case VK_DOWN:
                 p+=bufX;
-                goto WRITE;
+                goto READ;
                 break;
             case PAGEUP:
                 if (p>bufX*bufY) p-=bufX*bufY;
                 else p=0;
-                goto WRITE;
+                goto READ;
                 break;
             case PAGEDWN:
                 p+=bufX*bufY;
-                goto WRITE;
+                goto READ;
                 break;
             case ESC:
                 exit(0);
@@ -93,51 +111,98 @@ WRITE:
                     case 0:
                         displaymode=1;
                         bufX=26;
+                        md=0;
                         break;
                     case 1:
                         displaymode=2;
                         bufX=78;
+                        md=1;
                         break;
                     case 2:
                         displaymode=0;
                         bufX=19;
+                        md=0;
                         break;
                 }
                 goto BEGIN;
                 break;
             case '0':
+                if (!md) ky=0x0;
+                goto WRITE;
             case '1':
+                if (!md) ky=0x1;
+                goto WRITE;
             case '2':
+                if (!md) ky=0x2;
+                goto WRITE;
             case '3':
+                if (!md) ky=0x3;
+                goto WRITE;
             case '4':
+                if (!md) ky=0x4;
+                goto WRITE;
             case '5':
+                if (!md) ky=0x5;
+                goto WRITE;
             case '6':
+                if (!md) ky=0x6;
+                goto WRITE;
             case '7':
+                if (!md) ky=0x7;
+                goto WRITE;
             case '8':
+                if (!md) ky=0x8;
+                goto WRITE;
             case '9':
+                if (!md) ky=0x9;
+                goto WRITE;
             case 'A':
+                if (!md) ky=0xA;
+                goto WRITE;
             case 'B':
+                if (!md) ky=0xB;
+                goto WRITE;
             case 'C':
+                if (!md) ky=0xC;
+                goto WRITE;
             case 'D':
+                if (!md) ky=0xD;
+                goto WRITE;
             case 'E':
+                if (!md) ky=0xE;
+                goto WRITE;
             case 'F':
-                SetTextColor(LRED);
-                if (!kh){
-                    SetXY(1,0); printf("%c",i);
-                    kh=1;
-                    buf[0]=buf[0]-((buf[0]>>4)<<4)+(i<<4);
-                    write(buf[0]);
-                }
-                else {
-                    SetXY(2,0); printf("%c",i);
-                    kh=0;
-                    buf[0]=((buf[0]>>4)<<4)+i
-                    write(buf[0]);
-                }
-                SetTextColor(DWHITE);
-                break;
+                if (!md) ky=0xF;
+                goto WRITE;
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
+                if (md) goto WRITE;
             case BACKSPC:
-                if (kh) kh=0;
+                kh=!kh;
+                break;
+            case TAB:
+                md=!md;
+                Console(3);
+                goto UPDATE;
+                break;
         }
     }
 }

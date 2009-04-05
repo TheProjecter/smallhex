@@ -6,7 +6,7 @@
 
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0;
+bool kh=0,md=0;
 int32 p=0,size;
 byte displaymode=0;
 byte bufX=19,bufY=23,
@@ -22,7 +22,8 @@ void Console(int t){
     printf("Console: ");
     switch (t){
         case 0:
-            printf("Welcome to smallHex ^^");
+INFO:
+            SetXY(77,24); if (!md) printf("H"); else printf("C");
             break;
         case 1:
             printf("Reading to Offset: %08X/%08X",p,size);
@@ -31,6 +32,9 @@ void Console(int t){
         case 2:
             printf("Writing to Offset: %08X/%08X",p,size);
             break;
+        case 3:
+            printf("Switched the input mode             ");
+            goto INFO;
     }
 }
 
