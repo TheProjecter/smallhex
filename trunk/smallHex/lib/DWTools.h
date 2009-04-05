@@ -15,6 +15,7 @@ void   GetLibAbout();
 // General Functions
 void   cls();
 int    GetTextLong(char *);
+char  *GetFileName(char *);
 void   printCenter(char *);
 void   printRight(char *,byte);
 bool  *GetBin(byte);
