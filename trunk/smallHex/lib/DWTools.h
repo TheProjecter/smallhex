@@ -50,6 +50,7 @@ byte   GetBufferSizeY();
 void   SetBufferSize(COORD);
 void   SetBufferSizeX(byte);
 void   SetBufferSizeY(byte);
+bool   GetConsoleFocus();
 
 // Input / OutputCOORD GetMouseXY();
 COORD  GetMouseXY();

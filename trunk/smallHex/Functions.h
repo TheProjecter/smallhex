@@ -4,6 +4,7 @@
 #include "lib\DWTools.h"
 #include "lib\DWToolsDef.h"
 
+#define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
 bool kh=0,md=0;
@@ -38,7 +39,7 @@ INFO:
     }
 }
 
-void Alias(register char Char){
+char Alias(register char Char){
     switch(Char){
         case 0x00: // NULL
         case 0x07: // BEEP
@@ -46,10 +47,9 @@ void Alias(register char Char){
         case 0x09: // TAB
         case 0x0A: // NEW LINE
         case 0x0D: // RETURN
-            printf(" ");
-            break;
+            return 0x20;
         default:
-            printf("%c",Char);
+            return Char;
     }
 }
 

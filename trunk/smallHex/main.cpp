@@ -1,13 +1,13 @@
 #include "Functions.h"
 #define DEBUG
 
-
 int main(){
     SetConsoleTitle("smallHex");
     SetCursorVisible(false);
     SetBufferSizeY(25);
     register byte ky;
     byte *buf=(byte*)malloc(2048);
+    char *scrbuf=(char*)malloc(2048);
     char *path;
     #ifdef DEBUG
         path="test.bin";
@@ -37,8 +37,22 @@ READ:
         }
         if (displaymode!=1)
             for(int x=0;x<bufX;x++){
-                Alias(buf[x+bufX*y]);
+                switch (buf[x+bufX*y]){
+                    case 0x00: // NULL
+                    case 0x07: // BEEP
+                    case 0x08: // BACKSPACE
+                    case 0x09: // TAB
+                    case 0x0A: // NEW LINE
+                    case 0x0D: // RETURN
+NULLCHAR:
+                        scrbuf[x]=0x20;
+                        break;
+                    default:
+                        if (((x+bufX*y)+p)>size) goto NULLCHAR;
+                        scrbuf[x]=buf[x+bufX*y];
+                }
             }
+            printf("%s",scrbuf);
     }
     if (0==1){
 WRITE:
@@ -72,37 +86,50 @@ UPDATE:
     SetTextColor(DWHITE);
 
     while(1){
+NOFOCUS:
         Sleep(1);
+        if (!GetConsoleFocus()) goto NOFOCUS;
 
         ky=KeyX();
         switch(ky){
             case VK_LEFT:
-                if (p>0){
-                    p--;
+                while(KeyA(VK_LEFT))
+                    if (p>0){
+                        p--;
+                        goto READ;
+                    }
+                break;
+            case VK_RIGHT:
+                while(KeyA(VK_RIGHT)){
+                    if (p<size) p++;
                     goto READ;
                 }
                 break;
-            case VK_RIGHT:
-                p++;
-                goto READ;
-                break;
             case VK_UP:
-                if (p>bufX) p-=bufX;
-                else p=0;
-                goto READ;
+                while(KeyA(VK_UP)){
+                    if (p>bufX) p-=bufX;
+                    else p=0;
+                    goto READ;
+                }
                 break;
             case VK_DOWN:
-                p+=bufX;
-                goto READ;
+                while(KeyA(VK_DOWN)){
+                    p+=bufX;
+                    goto READ;
+                }
                 break;
             case PAGEUP:
-                if (p>bufX*bufY) p-=bufX*bufY;
-                else p=0;
-                goto READ;
+                while(KeyA(PAGEUP)){
+                    if (p>bufX*bufY) p-=bufX*bufY;
+                    else p=0;
+                    goto READ;
+                }
                 break;
             case PAGEDWN:
-                p+=bufX*bufY;
-                goto READ;
+                while(KeyA(PAGEDWN)){
+                    p+=bufX*bufY;
+                    goto READ;
+                }
                 break;
             case ESC:
                 exit(0);
@@ -125,6 +152,8 @@ UPDATE:
                         break;
                 }
                 goto BEGIN;
+                break;
+            case F6:
                 break;
             case '0':
                 if (!md) ky=0x0;
