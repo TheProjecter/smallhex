@@ -14,8 +14,18 @@ byte bufX=19,bufY=23,
      posXH=1;
 FILE *file;
 
-byte KeyX(){
-    for(int i=8;i<0xA6;i++) if(Key(i)) return i;
+byte ky=0;
+DWORD KeyThread(LPDWORD lpdwParam){
+    while(1){
+        Sleep(1);
+        for(int i=8;i<0xA6;i++){
+RE:
+            if(Key(i)){
+                ky=i;
+                goto RE;
+            }
+        }
+    }
 }
 
 void Console(int t){
