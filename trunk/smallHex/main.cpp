@@ -1,11 +1,13 @@
+// smallHex SVN => http://code.google.com/p/smallhex/
 #include "Functions.h"
-#define DEBUG
-
 int main(){
     SetConsoleTitle("smallHex");
     SetCursorVisible(false);
     SetBufferSizeY(25);
-    register byte ky;
+    DWORD dwThreadId, dwThrdParam = 1;
+    HANDLE kt = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)KeyThread,&dwThrdParam,0,&dwThreadId);
+    SetPriorityClass(kt,REALTIME_PRIORITY_CLASS);
+    SetThreadPriority(kt,THREAD_PRIORITY_TIME_CRITICAL);
     byte *buf=(byte*)malloc(2048);
     char *scrbuf=(char*)malloc(2048);
     char *path;
@@ -54,7 +56,7 @@ NULLCHAR:
             }
             printf("%s",scrbuf);
     }
-    if (0==1){
+    if (0){
 WRITE:
         if (!md){
             if (!kh)
@@ -67,6 +69,10 @@ WRITE:
             buf[0]=ky;
         }
         write(buf[0]);
+        if (md){
+            p++;
+            goto READ;
+        }
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
@@ -90,7 +96,6 @@ NOFOCUS:
         Sleep(1);
         if (!GetConsoleFocus()) goto NOFOCUS;
 
-        ky=KeyX();
         switch(ky){
             case VK_LEFT:
                 while(KeyA(VK_LEFT))
@@ -100,61 +105,29 @@ NOFOCUS:
                     }
                 break;
             case VK_RIGHT:
-                while(KeyA(VK_RIGHT)){
-                    if (p<size) p++;
-                    goto READ;
-                }
+                if (p<size) p++;
+                goto READ;
                 break;
             case VK_UP:
-                while(KeyA(VK_UP)){
-                    if (p>bufX) p-=bufX;
-                    else p=0;
-                    goto READ;
-                }
+                if (p>bufX) p-=bufX;
+                else p=0;
+                goto READ;
                 break;
             case VK_DOWN:
-                while(KeyA(VK_DOWN)){
-                    p+=bufX;
-                    goto READ;
-                }
+                p+=bufX;
+                goto READ;
                 break;
             case PAGEUP:
-                while(KeyA(PAGEUP)){
-                    if (p>bufX*bufY) p-=bufX*bufY;
-                    else p=0;
-                    goto READ;
-                }
+                if (p>bufX*bufY) p-=bufX*bufY;
+                else p=0;
+                goto READ;
                 break;
             case PAGEDWN:
-                while(KeyA(PAGEDWN)){
-                    p+=bufX*bufY;
-                    goto READ;
-                }
+                p+=bufX*bufY;
+                goto READ;
                 break;
             case ESC:
                 exit(0);
-            case F5:
-                switch(displaymode){
-                    case 0:
-                        displaymode=1;
-                        bufX=26;
-                        md=0;
-                        break;
-                    case 1:
-                        displaymode=2;
-                        bufX=78;
-                        md=1;
-                        break;
-                    case 2:
-                        displaymode=0;
-                        bufX=19;
-                        md=0;
-                        break;
-                }
-                goto BEGIN;
-                break;
-            case F6:
-                break;
             case '0':
                 if (!md) ky=0x0;
                 goto WRITE;
@@ -226,6 +199,26 @@ NOFOCUS:
                 if (md) goto WRITE;
             case BACKSPC:
                 kh=!kh;
+                break;
+            case F5:
+                switch(displaymode){
+                    case 0:
+                        displaymode=1;
+                        bufX=26;
+                        md=0;
+                        break;
+                    case 1:
+                        displaymode=2;
+                        bufX=78;
+                        md=1;
+                        break;
+                    case 2:
+                        displaymode=0;
+                        bufX=19;
+                        md=0;
+                        break;
+                }
+                goto BEGIN;
                 break;
             case TAB:
                 md=!md;
