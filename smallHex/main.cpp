@@ -18,7 +18,7 @@ int main(){
         scanf("%s",path);
     #endif
     file=fopen(path,"r+b");
-    size=FileSize(file);
+    size=FileSize(file)-1;
     register byte ky=0;
 BEGIN:
     cls();
@@ -33,9 +33,15 @@ READ:
         SetXY(posXH,y);
         if (displaymode!=2){
             for(int x=0;x<bufX;x++){
-                sprintf(hexbuf,"%02X",buf[x+bufX*y]);
-                scrbuf[x*3]=hexbuf[0];
-                scrbuf[x*3+1]=hexbuf[1];
+                if (((x+bufX*y)+p)>size){
+                    scrbuf[x*3]=0x20;
+                    scrbuf[x*3+1]=0x20;
+                }
+                else {
+                    sprintf(hexbuf,"%02X",buf[x+bufX*y]);
+                    scrbuf[x*3]=hexbuf[0];
+                    scrbuf[x*3+1]=hexbuf[1];
+                }
                 scrbuf[x*3+2]=0x20;
             }
         }
@@ -112,25 +118,22 @@ NOFOCUS:
             case VK_RIGHT:
                 if (p<size) p++;
                 goto READ;
-                break;
             case VK_UP:
                 if (p>bufX) p-=bufX;
                 else p=0;
                 goto READ;
-                break;
             case VK_DOWN:
-                p+=bufX;
+                if (p+bufX<size) p+=bufX;
+                else p=size;
                 goto READ;
-                break;
             case PAGEUP:
                 if (p>bufX*bufY) p-=bufX*bufY;
                 else p=0;
                 goto READ;
-                break;
             case PAGEDWN:
-                p+=bufX*bufY;
+                if (p+bufX*bufY<size) p+=bufX*bufY;
+                else p=size;
                 goto READ;
-                break;
             case ' ':
                 if (md) goto WRITE;
             case '0':
@@ -233,16 +236,19 @@ NOFOCUS:
                         md=0;
                         break;
                 }
-                for(int i=0;i<2048;i++){
-                    scrbuf[i]=0;
-                }
+                for(int i=0;i<2048;i++) scrbuf[i]=0;
                 goto BEGIN;
-                break;
             case TAB:
                 md=!md;
                 Console(3);
                 goto UPDATE;
                 break;
+            case 0x23: // END KEY
+                p=size;
+                goto READ;
+            case 0x24: // START KEY
+                p=0;
+                goto READ;
             case ESC:
                 free(scrbuf);
                 exit(0);
