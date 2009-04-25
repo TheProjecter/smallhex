@@ -1,3 +1,4 @@
+// smallHex SVN => http://code.google.com/p/smallhex/
 #include "Functions.h"
 
 int main(){
@@ -7,11 +8,12 @@ int main(){
     DWORD dwThreadId, dwThrdParam = 1;
     HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
     byte *buf=(byte*)malloc(2048);
-    char *scrbuf=(char*)malloc(2048);
+    char *scrbufC=(char*)malloc(2048);
+    char *scrbufH=(char*)malloc(2048);
+    char hexbuf[2];
     char *path;
     #ifdef DEBUG
         path="test.bin";
-        file=fopen("test.bin","r+b");
     #else
         printf("File to open: ");
         scanf("%s",path);
@@ -32,9 +34,12 @@ READ:
         SetXY(posXH,y);
         if (displaymode!=2){
             for(int x=0;x<bufX;x++){
-                printf("%02X ",buf[x+bufX*y]);
+                sprintf(hexbuf,"%02X",buf[x+bufX*y]);
+                scrbufH[x*3]=hexbuf[0];
+                scrbufH[x*3+1]=hexbuf[1];
+                scrbufH[x*3+2]=0x20;
             }
-            printf(" ");
+            printf("%s ",scrbufH);
         }
         if (displaymode!=1)
             for(int x=0;x<bufX;x++){
@@ -46,14 +51,14 @@ READ:
                     case 0x0A: // NEW LINE
                     case 0x0D: // RETURN
 NULLCHAR:
-                        scrbuf[x]=0x20;
+                        scrbufC[x]=0x20;
                         break;
                     default:
                         if (((x+bufX*y)+p)>size) goto NULLCHAR;
-                        scrbuf[x]=buf[x+bufX*y];
+                        scrbufC[x]=buf[x+bufX*y];
                 }
             }
-            printf("%s",scrbuf);
+            printf("%s",scrbufC);
     }
     if (0){
 WRITE:
@@ -65,6 +70,7 @@ WRITE:
             kh=!kh;
         }
         else {
+
             buf[0]=ky;
         }
         write(buf[0]);
@@ -72,7 +78,6 @@ WRITE:
             p++;
             goto READ;
         }
-
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
@@ -128,8 +133,6 @@ NOFOCUS:
                 p+=bufX*bufY;
                 goto READ;
                 break;
-            case ESC:
-                exit(0);
             case '0':
                 if (!md) ky=0x0;
                 goto WRITE;
@@ -220,6 +223,10 @@ NOFOCUS:
                         md=0;
                         break;
                 }
+                for(int i=0;i<2048;i++){
+                    scrbufC[i]=0;
+                    scrbufH[i]=0;
+                }
                 goto BEGIN;
                 break;
             case TAB:
@@ -227,6 +234,10 @@ NOFOCUS:
                 Console(3);
                 goto UPDATE;
                 break;
+            case ESC:
+                free(scrbufC);
+                free(scrbufH);
+                exit(0);
         }
     }
 }
