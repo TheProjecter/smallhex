@@ -12,9 +12,13 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-march=i586" />
+					<Add option="-Os" />
+					<Add option="-O3" />
 					<Add option="-DDEBUG" />
 				</Compiler>
 				<Linker>
+					<Add option="-s" />
 					<Add library="lib\libDWTools.a" />
 				</Linker>
 			</Target>
@@ -25,6 +29,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-march=i586" />
+					<Add option="-Os" />
 					<Add option="-O3" />
 				</Compiler>
 				<Linker>
@@ -35,12 +40,8 @@
 		</Build>
 		<Compiler>
 			<Add option="-march=i586" />
+			<Add option="-Os" />
 			<Add option="-O3" />
-			<Add option="-O2" />
-			<Add option="-O1" />
-			<Add option="-O" />
-			<Add option="-Wall" />
-			<Add option="-ansi" />
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Linker>

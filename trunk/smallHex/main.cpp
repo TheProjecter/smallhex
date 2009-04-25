@@ -1,13 +1,11 @@
-// smallHex SVN => http://code.google.com/p/smallhex/
 #include "Functions.h"
+
 int main(){
     SetConsoleTitle("smallHex");
     SetCursorVisible(false);
     SetBufferSizeY(25);
     DWORD dwThreadId, dwThrdParam = 1;
-    HANDLE kt = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)KeyThread,&dwThrdParam,0,&dwThreadId);
-    SetPriorityClass(kt,REALTIME_PRIORITY_CLASS);
-    SetThreadPriority(kt,THREAD_PRIORITY_TIME_CRITICAL);
+    HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
     byte *buf=(byte*)malloc(2048);
     char *scrbuf=(char*)malloc(2048);
     char *path;
@@ -20,6 +18,7 @@ int main(){
     #endif
     file=fopen(path,"r+b");
     size=FileSize(file);
+    register byte ky=0;
 BEGIN:
     cls();
     DrawLineX(1,GetBufferSizeY()-2,GetBufferSizeX()-2);
@@ -73,6 +72,7 @@ WRITE:
             p++;
             goto READ;
         }
+
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
@@ -90,19 +90,21 @@ UPDATE:
         Alias(buf[0]);
     }
     SetTextColor(DWHITE);
-
+    ky=0;
     while(1){
 NOFOCUS:
         Sleep(1);
-        if (!GetConsoleFocus()) goto NOFOCUS;
+        if (!focus) goto NOFOCUS;
+
+        for(register int i=8;i<0xA6;i++)
+            if(Key(i)) ky=i;
 
         switch(ky){
             case VK_LEFT:
-                while(KeyA(VK_LEFT))
-                    if (p>0){
-                        p--;
-                        goto READ;
-                    }
+                if (p>0){
+                    p--;
+                    goto READ;
+                }
                 break;
             case VK_RIGHT:
                 if (p<size) p++;
