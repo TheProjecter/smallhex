@@ -70,7 +70,6 @@ WRITE:
             kh=!kh;
         }
         else {
-
             buf[0]=ky;
         }
         write(buf[0]);
@@ -133,34 +132,46 @@ NOFOCUS:
                 p+=bufX*bufY;
                 goto READ;
                 break;
+            case ' ':
+                if (md) goto WRITE;
             case '0':
+            case '0'+0x30:
                 if (!md) ky=0x0;
                 goto WRITE;
             case '1':
+            case '1'+0x30:
                 if (!md) ky=0x1;
                 goto WRITE;
             case '2':
+            case '2'+0x30:
                 if (!md) ky=0x2;
                 goto WRITE;
             case '3':
+            case '3'+0x30:
                 if (!md) ky=0x3;
                 goto WRITE;
             case '4':
+            case '4'+0x30:
                 if (!md) ky=0x4;
                 goto WRITE;
             case '5':
+            case '5'+0x30:
                 if (!md) ky=0x5;
                 goto WRITE;
             case '6':
+            case '6'+0x30:
                 if (!md) ky=0x6;
                 goto WRITE;
             case '7':
+            case '7'+0x30:
                 if (!md) ky=0x7;
                 goto WRITE;
             case '8':
+            case '8'+0x30:
                 if (!md) ky=0x8;
                 goto WRITE;
             case '9':
+            case '9'+0x30:
                 if (!md) ky=0x9;
                 goto WRITE;
             case 'A':
