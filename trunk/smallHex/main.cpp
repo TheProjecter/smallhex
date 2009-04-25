@@ -8,8 +8,7 @@ int main(){
     DWORD dwThreadId, dwThrdParam = 1;
     HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
     byte *buf=(byte*)malloc(2048);
-    char *scrbufC=(char*)malloc(2048);
-    char *scrbufH=(char*)malloc(2048);
+    char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
     char *path;
     #ifdef DEBUG
@@ -35,12 +34,12 @@ READ:
         if (displaymode!=2){
             for(int x=0;x<bufX;x++){
                 sprintf(hexbuf,"%02X",buf[x+bufX*y]);
-                scrbufH[x*3]=hexbuf[0];
-                scrbufH[x*3+1]=hexbuf[1];
-                scrbufH[x*3+2]=0x20;
+                scrbuf[x*3]=hexbuf[0];
+                scrbuf[x*3+1]=hexbuf[1];
+                scrbuf[x*3+2]=0x20;
             }
-            printf("%s ",scrbufH);
         }
+        scrbuf[bufX*3]=0x20;
         if (displaymode!=1)
             for(int x=0;x<bufX;x++){
                 switch (buf[x+bufX*y]){
@@ -51,14 +50,14 @@ READ:
                     case 0x0A: // NEW LINE
                     case 0x0D: // RETURN
 NULLCHAR:
-                        scrbufC[x]=0x20;
+                        scrbuf[x+(bufX*3)]=0x20;
                         break;
                     default:
                         if (((x+bufX*y)+p)>size) goto NULLCHAR;
-                        scrbufC[x]=buf[x+bufX*y];
+                        scrbuf[x+(bufX*3)+1]=buf[x+bufX*y];
                 }
             }
-            printf("%s",scrbufC);
+            printf("%s",scrbuf);
     }
     if (0){
 WRITE:
@@ -235,8 +234,7 @@ NOFOCUS:
                         break;
                 }
                 for(int i=0;i<2048;i++){
-                    scrbufC[i]=0;
-                    scrbufH[i]=0;
+                    scrbuf[i]=0;
                 }
                 goto BEGIN;
                 break;
@@ -246,8 +244,7 @@ NOFOCUS:
                 goto UPDATE;
                 break;
             case ESC:
-                free(scrbufC);
-                free(scrbufH);
+                free(scrbuf);
                 exit(0);
         }
     }
