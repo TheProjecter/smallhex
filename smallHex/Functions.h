@@ -7,27 +7,19 @@
 #define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0,md=0;
+bool kh=0,md=0,focus;
 int32 p=0,size;
 byte displaymode=0;
 byte bufX=19,bufY=23,
      posXH=1;
 FILE *file;
 
-byte ky=0;
-DWORD KeyThread(LPDWORD lpdwParam){
+DWORD FocusThread(){
     while(1){
-        Sleep(1);
-        for(int i=8;i<0xA6;i++){
-RE:
-            if(Key(i)){
-                ky=i;
-                goto RE;
-            }
-        }
+        Sleep(5);
+        focus=GetConsoleFocus();
     }
 }
-
 void Console(int t){
     SetXY(2,24);
     printf("Console: ");
