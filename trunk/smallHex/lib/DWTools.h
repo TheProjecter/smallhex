@@ -1,7 +1,7 @@
 #define byte  unsigned char
 #define int16 short int
-#define int32 long int
-#define int64 long long
+#define int32 unsigned int
+#define int64 DWORD64
 
 #define PrintMenu(x,y,z)   _PrintMenu(x,y,sizeof(z)/4,z)
 
@@ -44,13 +44,13 @@ long   RegGetByte(HKEY,char*,char*);
 byte  *RegGetBin(HKEY,char*,char*);
 
 // Console
+bool   GetConsoleFocus();
 COORD  GetBufferSize();
 byte   GetBufferSizeX();
 byte   GetBufferSizeY();
 void   SetBufferSize(COORD);
 void   SetBufferSizeX(byte);
 void   SetBufferSizeY(byte);
-bool   GetConsoleFocus();
 
 // Input / OutputCOORD GetMouseXY();
 COORD  GetMouseXY();
@@ -156,3 +156,9 @@ int    NCA1(char*);
 int    NCA2(char*);
 int    NCA1File(char*);
 int    NCA2File(char*);
+
+// Processes
+HANDLE AttachProcess(const char);
+bool   ReleaseProcess(HANDLE);
+int   *RamRead(HANDLE,int,int);
+bool   RamWrite(HANDLE,int,int*,int);
