@@ -7,7 +7,7 @@ int main(){
     SetBufferSizeY(25);
     DWORD dwThreadId, dwThrdParam = 1;
     HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
-    byte *buf=(byte*)malloc(2048);
+    byte *buf=(byte*)malloc(4096);
     char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
     char *path;
@@ -28,10 +28,9 @@ SWITCH:
 READ:
     ConsoleX(1);
     fseek(file,p,SEEK_SET);
-    fread(buf,1,2048,file);
-
+    fread(buf,1,4096,file);
+    SetXY(0,0);
     for(int y=0;y<bufY;y++){
-        SetXY(0,y);
         scrbuf[0]=0x20;
         if (displaymode!=2){
             for(int x=0;x<bufX;x++){
@@ -45,6 +44,7 @@ READ:
                     scrbuf[x*3+2]=hexbuf[1];
                 }
                 scrbuf[x*3+3]=0x20;
+                Debug("Buffer",x+bufX*y);
             }
         }
         scrbuf[bufX*3+1]=0x20;
@@ -67,6 +67,7 @@ NULLCHAR:
                         else scrbuf[x+(bufX*3)+2]=buf[x+bufX*y];
                 }
             }
+        scrbuf[GetBufferSizeX()-1-xd]='\n';
         printf("%s",scrbuf);
     }
     if (0){
@@ -235,16 +236,18 @@ NOFOCUS:
                         displaymode=1;
                         bufX=26;
                         md=0;
+                        xd=!xd;
                         break;
                     case 1:
                         displaymode=2;
                         bufX=78;
-                        md=1;
+                        md=0;
                         break;
                     case 2:
                         displaymode=0;
                         bufX=19;
-                        md=0;
+                        md=1;
+                        xd=!xd;
                         break;
                 }
                 for(int i=0;i<2048;i++) scrbuf[i]=0;
@@ -268,6 +271,7 @@ NOFOCUS:
                 p=0;
                 goto READ;
             case ESC:
+                fclose(file);
                 cls();
                 free(scrbuf);
                 exit(0);

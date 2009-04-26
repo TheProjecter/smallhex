@@ -7,13 +7,20 @@
 #define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0,md=0,up=0,focus;
+bool kh=0,md=0,up=0,xd=1,focus;
 int32 p=0,size,divid;
 byte displaymode=0;
 byte bufX=19,bufY=23,
      posXH=1;
 FILE *file;
 
+#ifdef DEBUG
+void Debug(char *description,int bytex){
+    FILE *debug=fopen("_debug.txt","r+b");
+    fprintf(debug,"%s - %u",description,bytex);
+    fclose(debug);
+}
+#endif
 DWORD FocusThread(){
     while(1){
         Sleep(5);
