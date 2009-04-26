@@ -31,22 +31,23 @@ READ:
     fread(buf,1,2048,file);
 
     for(int y=0;y<bufY;y++){
-        SetXY(posXH,y);
+        SetXY(0,y);
+        scrbuf[0]=0x20;
         if (displaymode!=2){
             for(int x=0;x<bufX;x++){
                 if (((x+bufX*y)+p)>size){
-                    scrbuf[x*3]=0x20;
                     scrbuf[x*3+1]=0x20;
+                    scrbuf[x*3+2]=0x20;
                 }
                 else {
                     sprintf(hexbuf,"%02X",buf[x+bufX*y]);
-                    scrbuf[x*3]=hexbuf[0];
-                    scrbuf[x*3+1]=hexbuf[1];
+                    scrbuf[x*3+1]=hexbuf[0];
+                    scrbuf[x*3+2]=hexbuf[1];
                 }
-                scrbuf[x*3+2]=0x20;
+                scrbuf[x*3+3]=0x20;
             }
         }
-        scrbuf[bufX*3]=0x20;
+        scrbuf[bufX*3+1]=0x20;
         if (displaymode!=1)
             for(int x=0;x<bufX;x++){
                 switch (buf[x+bufX*y]){
@@ -57,14 +58,16 @@ READ:
                     case 0x0A: // NEW LINE
                     case 0x0D: // RETURN
 NULLCHAR:
-                        scrbuf[x+(bufX*3)+1]=0x20;
+                        if (displaymode==2) scrbuf[x+1]=0x20;
+                        else scrbuf[x+(bufX*3)+2]=0x20;
                         break;
                     default:
                         if (((x+bufX*y)+p)>size) goto NULLCHAR;
-                        else scrbuf[x+(bufX*3)+1]=buf[x+bufX*y];
+                        else if (displaymode==2) scrbuf[x+1]=buf[x+bufX*y];
+                        else scrbuf[x+(bufX*3)+2]=buf[x+bufX*y];
                 }
             }
-            printf("%s",scrbuf);
+        printf("%s",scrbuf);
     }
     if (0){
 WRITE:
