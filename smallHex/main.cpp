@@ -11,6 +11,7 @@ int main(){
     char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
     char *path;
+OPEN:
     #ifdef DEBUG
         path="test.bin";
     #else
@@ -20,12 +21,12 @@ int main(){
     file=fopen(path,"r+b");
     size=FileSize(file)-1;
     register byte ky=0;
-BEGIN:
+SWITCH:
     cls();
     DrawLineX(1,GetBufferSizeY()-2,GetBufferSizeX()-2);
-    Console(0);
+    ConsoleX(0xFF);
 READ:
-    Console(1);
+    ConsoleX(1);
     fseek(file,p,SEEK_SET);
     fread(buf,1,2048,file);
 
@@ -56,11 +57,11 @@ READ:
                     case 0x0A: // NEW LINE
                     case 0x0D: // RETURN
 NULLCHAR:
-                        scrbuf[x+(bufX*3)]=0x20;
+                        scrbuf[x+(bufX*3)+1]=0x20;
                         break;
                     default:
                         if (((x+bufX*y)+p)>size) goto NULLCHAR;
-                        scrbuf[x+(bufX*3)+1]=buf[x+bufX*y];
+                        else scrbuf[x+(bufX*3)+1]=buf[x+bufX*y];
                 }
             }
             printf("%s",scrbuf);
@@ -75,7 +76,8 @@ WRITE:
             kh=!kh;
         }
         else {
-            buf[0]=ky;
+            if (up) buf[0]=ky;
+            else buf[0]=ky+0x20;
         }
         write(buf[0]);
         if (md){
@@ -85,8 +87,14 @@ WRITE:
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
-        if (!md) SetTextColor(LRED);
-        SetXY(posXH,0); printf("%02X",buf[0]);
+        if (!md) SetTextColor(LRED);{
+            SetXY(posXH,0); printf("%02X",buf[0]);
+/*   //     NEW HEXEDIT SYSTEM, BUT I DON'T LIKE IT :S
+            SetXY(posXH+kh,0);
+            if (!kh) printf("%X",buf[0]>>4);
+            else printf("%X",buf[0]-(buf[0]>>4<<4));
+*/
+        }
     }
     if (displaymode==0){
         SetXY(bufX*3+2,0);
@@ -237,11 +245,18 @@ NOFOCUS:
                         break;
                 }
                 for(int i=0;i<2048;i++) scrbuf[i]=0;
-                goto BEGIN;
+                goto SWITCH;
+            case F12:
+                goto OPEN;
             case TAB:
                 md=!md;
-                Console(3);
+                ConsoleX(3);
                 goto UPDATE;
+                break;
+            case 0xA0:
+            case 0xA1:
+                up=!up;
+                ConsoleX(0);
                 break;
             case 0x23: // END KEY
                 p=size;
@@ -250,6 +265,7 @@ NOFOCUS:
                 p=0;
                 goto READ;
             case ESC:
+                cls();
                 free(scrbuf);
                 exit(0);
         }
