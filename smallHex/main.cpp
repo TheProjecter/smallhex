@@ -22,8 +22,9 @@ OPEN:
     size=FileSize(file)-1;
     register byte ky=0;
 SWITCH:
+    COORD conbuf={GetBufferSizeX(),GetBufferSizeY()};
     cls();
-    DrawLineX(1,GetBufferSizeY()-2,GetBufferSizeX()-2);
+    DrawLineX(1,conbuf.Y-2,conbuf.X-2);
     ConsoleX(0xFF);
 READ:
     ConsoleX(1);
@@ -31,23 +32,22 @@ READ:
     fread(buf,1,4096,file);
     SetXY(0,0);
     for(int y=0;y<bufY;y++){
-        scrbuf[0]=0x20;
+        scrbuf[0+conbuf.X*y]=0x20;
         if (displaymode!=2){
             for(int x=0;x<bufX;x++){
                 if (((x+bufX*y)+p)>size){
-                    scrbuf[x*3+1]=0x20;
-                    scrbuf[x*3+2]=0x20;
+                    scrbuf[x*3+1+conbuf.X*y]=0x20;
+                    scrbuf[x*3+2+conbuf.X*y]=0x20;
                 }
                 else {
                     sprintf(hexbuf,"%02X",buf[x+bufX*y]);
-                    scrbuf[x*3+1]=hexbuf[0];
-                    scrbuf[x*3+2]=hexbuf[1];
+                    scrbuf[x*3+1+conbuf.X*y]=hexbuf[0];
+                    scrbuf[x*3+2+conbuf.X*y]=hexbuf[1];
                 }
-                scrbuf[x*3+3]=0x20;
-                Debug("Buffer",x+bufX*y);
+                scrbuf[x*3+3+conbuf.X*y]=0x20;
             }
         }
-        scrbuf[bufX*3+1]=0x20;
+        scrbuf[bufX*3+1+conbuf.X*y]=0x20;
         if (displaymode!=1)
             for(int x=0;x<bufX;x++){
                 switch (buf[x+bufX*y]){
@@ -58,18 +58,19 @@ READ:
                     case 0x0A: // NEW LINE
                     case 0x0D: // RETURN
 NULLCHAR:
-                        if (displaymode==2) scrbuf[x+1]=0x20;
-                        else scrbuf[x+(bufX*3)+2]=0x20;
+                        if (displaymode==2) scrbuf[x+1+conbuf.X*y]=0x20;
+                        else scrbuf[x+(bufX*3)+2+conbuf.X*y]=0x20;
                         break;
                     default:
                         if (((x+bufX*y)+p)>size) goto NULLCHAR;
-                        else if (displaymode==2) scrbuf[x+1]=buf[x+bufX*y];
-                        else scrbuf[x+(bufX*3)+2]=buf[x+bufX*y];
+                        else if (displaymode==2) scrbuf[x+1+conbuf.X*y]=buf[x+bufX*y];
+                        else scrbuf[x+(bufX*3)+2+conbuf.X*y]=buf[x+bufX*y];
                 }
             }
-        scrbuf[GetBufferSizeX()-1-xd]='\n';
-        printf("%s",scrbuf);
+        scrbuf[conbuf.X-1-xd+conbuf.X*y]=' ';
+        scrbuf[conbuf.X-1+conbuf.X*y]=' ';
     }
+    printf("%s",scrbuf);
     if (0){
 WRITE:
         if (!md){
@@ -92,12 +93,16 @@ WRITE:
 UPDATE:
     if (displaymode==0||displaymode==1){
         if (!md) SetTextColor(LRED);{
-            SetXY(posXH,0); printf("%02X",buf[0]);
-/*   //     NEW HEXEDIT SYSTEM, BUT I DON'T LIKE IT :S
-            SetXY(posXH+kh,0);
-            if (!kh) printf("%X",buf[0]>>4);
-            else printf("%X",buf[0]-(buf[0]>>4<<4));
-*/
+
+            if (0){ // NEW HEXEDIT SYSTEM, BUT I DON'T LIKE IT. For activate, replace 0 with 1
+                SetXY(posXH+kh,0);
+                if (!kh) printf("%X",buf[0]>>4);
+                else printf("%X",buf[0]-(buf[0]>>4<<4));
+            }
+            else {
+                SetXY(posXH,0); printf("%02X",buf[0]);
+            }
+
         }
     }
     if (displaymode==0){
@@ -241,12 +246,12 @@ NOFOCUS:
                     case 1:
                         displaymode=2;
                         bufX=78;
-                        md=0;
+                        md=1;
                         break;
                     case 2:
                         displaymode=0;
                         bufX=19;
-                        md=1;
+                        md=0;
                         xd=!xd;
                         break;
                 }
@@ -255,9 +260,11 @@ NOFOCUS:
             case F12:
                 goto OPEN;
             case TAB:
-                md=!md;
-                ConsoleX(3);
-                goto UPDATE;
+                if (displaymode==0){
+                    md=!md;
+                    ConsoleX(3);
+                    goto UPDATE;
+                }
                 break;
             case 0xA0:
             case 0xA1:
