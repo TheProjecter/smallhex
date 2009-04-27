@@ -14,13 +14,6 @@ byte bufX=19,bufY=23,
      posXH=1;
 FILE *file;
 
-#ifdef DEBUG
-void Debug(char *description,int bytex){
-    FILE *debug=fopen("_debug.txt","r+b");
-    fprintf(debug,"%s - %u",description,bytex);
-    fclose(debug);
-}
-#endif
 DWORD FocusThread(){
     while(1){
         Sleep(5);
