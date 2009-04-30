@@ -116,6 +116,7 @@ UPDATE:
         Alias(buf[0]);
     }
     SetTextColor(DWHITE);
+WHILEEX:
     ky=0;
     while(1){
 NOFOCUS:
@@ -263,14 +264,13 @@ NOFOCUS:
                 if (displaymode==0){
                     md=!md;
                     ConsoleX(3);
-                    goto UPDATE;
+                    goto WHILEEX;
                 }
-                break;
             case 0xA0:
             case 0xA1:
                 up=!up;
                 ConsoleX(0);
-                break;
+                goto WHILEEX;
             case 0x23: // END KEY
                 p=size;
                 goto READ;
