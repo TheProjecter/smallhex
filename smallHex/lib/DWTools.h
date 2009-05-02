@@ -1,8 +1,6 @@
 #define byte  unsigned char
-#define int16 short int
+#define int16 unsigned short int
 #define int32 unsigned int
-#define int64 DWORD64
-
 #define PrintMenu(x,y,z)   _PrintMenu(x,y,sizeof(z)/4,z)
 
 byte   GetLibVerMax();
@@ -34,6 +32,11 @@ char  *GetOSSPBuild();
 char  *GetOSSystemRoot();
 char  *GetOSRegOwner();
 char  *GetOSRegOrganization();
+int    SetMonitorResolution(int width,int height,int bxp, int hrz);
+int    GetMonitorResolutionWidth();
+int    GetMonitorResolutionHeight();
+int    GetMonitorResolutionBits();
+int    GetMonitorResolutionFrequency();
 
 // Registry
 long   RegCreateKeys(HKEY,char*);
@@ -120,18 +123,22 @@ void   DrawRect(byte,byte,byte,byte);
 void   DrawDRect(byte,byte,byte,byte);
 void   DrawEmptyLineX(byte,byte,byte);
 void   DrawEmptyLineY(byte,byte,byte);
-void   DrawEmptySquare(byte,byte,byte line);
+void   DrawEmptySquare(byte,byte,byte);
 void   DrawEmptyRect(byte,byte,byte,byte);
+void   FillSquare(byte,byte,byte);
+void   FillDSquare(byte,byte,byte);
+void   FillRect(byte,byte,byte,byte);
+void   FillDRect(byte,byte,byte,byte);
 
 // Date and Time
-int16  GetDateYear();
+int    GetDateYear();
 byte   GetDateMonth();
 byte   GetDateDayOfWeek();
 byte   GetDateDay();
 byte   GetTimeHours();
 byte   GetTimeMinutes();
 byte   GetTimeSeconds();
-int16  GetTimeMilliseconds();
+int    GetTimeMilliseconds();
 void   SetTimeYear(int16);
 void   SetTimeMonth(byte);
 void   SetTimeDay(byte);
@@ -141,7 +148,7 @@ void   SetTimeSeconds(byte);
 void   SetTimeMilliseconds(int16);
 int    TimeScan(); // For Milliseconds,Seconds,Minutes, Hours and Days
 int    TimeScanSimple(); // For Milliseconds,Seconds,Minutes and Hours
-int64  TimeScanAdvance(); // For Milliseconds,Seconds,Minutes, Hours, Days and Months
+int    TimeScanAdvance(); // For Milliseconds,Seconds,Minutes, Hours, Days and Months
 int    TimeResult(int);
 int    TimeResult(int,int);
 int    TimeResultSeconds(int);
