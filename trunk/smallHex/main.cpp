@@ -2,7 +2,11 @@
 #include "Functions.h"
 
 int main(){
-    SetConsoleTitle("smallHex");
+#ifdef DEBUG
+    SetConsoleTitle("smallHex SVN");
+#elseif
+    SetConsoleTitle("smallHex (Beta)");
+#endif
     SetCursorVisible(false);
     SetBufferSizeY(25);
     DWORD dwThreadId, dwThrdParam = 1;
@@ -15,6 +19,16 @@ OPEN:
     #ifdef DEBUG
         path="test.bin";
     #else
+        SetBackColor(DWHITE); SetTextColor(BLACK);
+        DrawEmptyLineX(0,0,GetBufferSizeX());
+        SetY(0); printCenter("- Welcome to smallHex -");
+        SetBackColor(BLACK); SetTextColor(DWHITE);
+        DrawLineX(1,21,GetBufferSizeX()-2);
+        SetXY(1,22); printf("smallHex Beta Revision 22");
+        printRight("Software created by Xeeynamo",1);
+        SetXY(1,23); printf("DWTools Lib v.%i.%i.%i [%s]",GetLibVerMax(),GetLibVerMin(),GetLibVerRel(),GetLibVerDate());
+        printRight("http://digitalwork.altervista.org",1);
+        SetXY(2,3);
         printf("File to open: ");
         scanf("%s",path);
     #endif
