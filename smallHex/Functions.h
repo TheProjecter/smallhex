@@ -20,6 +20,14 @@ DWORD FocusThread(){
         focus=GetConsoleFocus();
     }
 }
+byte HexInput(){
+    byte ky=0;
+    for(register int i=0x2F;i<0x70;i++) if(Key(i)) ky=i;
+    if (ky>=0x30&&ky<=0x39) return ky-0x30;
+    else if (ky>=0x60&&ky<=0x69) return ky-0x60;
+    else if (ky>='A'&&ky<='F') return ky-0x37;
+    else return 0xFF;
+}
 void ConsoleX(byte t){
     SetXY(11,24);
     switch (t){
@@ -47,6 +55,13 @@ INFO:
         case 3:
             printf("Switched the input mode             ");
             goto INFO;
+        case 4:
+            printf("Offset                              ");
+            break;
+        case 5:
+            printf("Error: The offset is too big...     ");
+            Sleep(1000);
+            break;
         case 0xFF:
             SetXY(2,24);
             printf("Console: ");
@@ -117,8 +132,6 @@ REMENU:
         MenuCycle(cx+1,cy,MENUY-1);
         if (Key(RETURN)){
             switch(GetMenuOption()){
-                case 1:
-                    return 1;
                 case 2:
                     if (!md) md=1;
                     else if (!up) up=1;
@@ -128,8 +141,8 @@ REMENU:
                     }
                     ConsoleX(3);
                     goto REMENU;
-                case 4:
-                    return 4;
+                default:
+                    return GetMenuOption();
             }
         }
         else if (Key(CTRLSX)||Key(CTRLDX)) return 0;
