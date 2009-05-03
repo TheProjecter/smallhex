@@ -148,3 +148,11 @@ REMENU:
         else if (Key(CTRLSX)||Key(CTRLDX)) return 0;
     }
 }
+void Help(){
+    #define HELP 6
+    const char *help[HELP]={" F1   Help"," F2   Change Display Mode"," F3   Go to Offset"," ","TAB   Switch Input Mode","ESC   Close smallHex"};
+    for(int i=0;i<HELP;i++){
+        SetXY(3,1+i); printf("%s",help[i]);
+    }
+    DrawLineLinkY(7,0,GetBufferSizeY()-2);
+}

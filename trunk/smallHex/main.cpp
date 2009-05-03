@@ -153,9 +153,14 @@ MENU:
                 while(1){
                     Sleep(1);
                     k=HexInput();
-                    if (k<0x10&&px<0x10000000){
+                    if (k<0x10){
                         px=(px<<4)+k;
-                        SetXY(11,24); printf("Offset %X",px);
+OFFSET:
+                        SetXY(11,24); printf("Offset %8X",px);
+                    }
+                    else if (Key(BACKSPC)){
+                        px>>=4;
+                        goto OFFSET;
                     }
                     else if (Key(RETURN)){
                         if (px<=size){
@@ -287,24 +292,12 @@ NOFOCUS:
             case BACKSPC:
                 kh=!kh;
                 break;
-#ifdef DEBUG
             case F1:
-                cls();
+                FillRect(1,0,conbuf.X-3,conbuf.Y-2);
+                Help();
+                Pause(RETURN);
                 DrawLineX(1,conbuf.Y-2,conbuf.X-2);
-                ConsoleX(0xFF);
-                SetXY(0,2);
-                printf("    F1   Help\n",
-                       "    F2   Change Display Mode"
-                       "   TAB   Switch Input Mode",
-                       "   ESC   Close smallHex"
-                       );
-                fclose(file);
-                cls();
-                free(scrbuf);
-                MessageBox(NULL,"Function not implemented","smallHex",MB_OK|MB_ICONERROR|MB_TOPMOST);
-                exit(-1);
                 break;
-#endif
             case F2:
                 ChangeDisplayMode();
                 goto SWITCH;
