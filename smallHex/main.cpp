@@ -4,7 +4,7 @@
 int main(){
 #ifdef DEBUG
     SetConsoleTitle("smallHex SVN");
-#elseif
+#else
     SetConsoleTitle("smallHex (Beta)");
 #endif
     SetCursorVisible(false);
@@ -15,6 +15,7 @@ int main(){
     char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
     char *path;
+    cls();
 OPEN:
     #ifdef DEBUG
         path="test.bin";
@@ -40,6 +41,7 @@ SWITCH:
     cls();
     DrawLineX(1,conbuf.Y-2,conbuf.X-2);
     ConsoleX(0xFF);
+    for(int i=0;i<2048;i++) scrbuf[i]=0;
 READ:
     ConsoleX(1);
     fseek(file,p,SEEK_SET);
@@ -132,6 +134,10 @@ UPDATE:
     SetTextColor(DWHITE);
 WHILEEX:
     ky=0;
+    if (mu){
+        mu=0;
+        Menu();
+    }
     while(1){
 NOFOCUS:
         Sleep(1);
@@ -251,39 +257,23 @@ NOFOCUS:
                 kh=!kh;
                 break;
             case F5:
-                switch(displaymode){
-                    case 0:
-                        displaymode=1;
-                        bufX=26;
-                        md=0;
-                        xd=!xd;
-                        break;
-                    case 1:
-                        displaymode=2;
-                        bufX=78;
-                        md=1;
-                        break;
-                    case 2:
-                        displaymode=0;
-                        bufX=19;
-                        md=0;
-                        xd=!xd;
-                        break;
-                }
-                for(int i=0;i<2048;i++) scrbuf[i]=0;
+                ChangeDisplayMode();
                 goto SWITCH;
             case F12:
                 goto OPEN;
             case TAB:
                 if (displaymode==0){
                     md=!md;
+                    up=0;
                     ConsoleX(3);
                     goto WHILEEX;
                 }
             case 0xA0:
             case 0xA1:
-                up=!up;
-                ConsoleX(0);
+                if (md){
+                    up=!up;
+                    ConsoleX(0);
+                }
                 goto WHILEEX;
             case 0x23: // END KEY
                 p=size;
@@ -291,6 +281,10 @@ NOFOCUS:
             case 0x24: // START KEY
                 p=0;
                 goto READ;
+            case CTRLDX:
+            case CTRLSX:
+                Menu();
+                goto SWITCH;
             case ESC:
                 fclose(file);
                 cls();

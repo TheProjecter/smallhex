@@ -7,7 +7,7 @@
 #define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0,md=0,up=0,xd=1,focus;
+bool kh=0,md=0,up=0,xd=1,mu=0,focus;
 int32 p=0,size,divid;
 byte displaymode=0;
 byte bufX=19,bufY=23,
@@ -53,7 +53,27 @@ INFO:
             goto INFO;
     }
 }
-
+void ChangeDisplayMode(){
+    switch(displaymode){
+        case 0:
+            displaymode=1;
+            bufX=26;
+            md=0;
+            xd=!xd;
+            break;
+        case 1:
+            displaymode=2;
+            bufX=78;
+            md=1;
+            break;
+        case 2:
+            displaymode=0;
+            bufX=19;
+            md=0;
+            xd=!xd;
+            break;
+    }
+}
 char Alias(register char Char){
     switch(Char){
         case 0x00: // NULL
@@ -67,15 +87,41 @@ char Alias(register char Char){
             return Char;
     }
 }
-
 void write(byte code){
     fseek(file,p,SEEK_SET);
     fprintf(file,"%c",code);
     ConsoleX(2);
 }
-
 int FileSize(FILE *file){
     fseek(file,0,SEEK_END);
     return ftell(file);
 }
-
+void Menu(){
+    #define MENUX 18
+    #define MENUY 5
+    const char *mode[3]={"Hex/Char Mode","Only Hex Mode","Only Char Mode"};
+    const char *edit[3]={"Hex Edit","Char Edit","CHAR Edit"};
+    const char *menu[2]={"Go to Offset","New File"};
+    int cx=(GetBufferSizeX()-MENUX)/2;
+    int cy=(GetBufferSizeY()-MENUY)/2-3;
+    FillDRect(cx,cy,MENUX,MENUY);
+REMENU:
+    SetXY(cx+3,cy+1); printf("%s",mode[displaymode]);
+    SetXY(cx+3,cy+2); printf("%s",edit[md+up]);
+    for(int i=0;i<2;i++){
+        SetXY(cx+3,cy+3+i); printf("%s",menu[i]);
+    }
+    SetXY(cx+1,cy+GetMenuOption()); printf(">");
+    while(!(Key(ESC))&&!(Key(CTRLSX))&&!(Key(CTRLDX))&&!mu){
+        Sleep(1);
+        MenuCycle(cx+1,cy,MENUY-1);
+        if (Key(RETURN)){
+            switch(GetMenuOption()){
+                case 1:
+                    ChangeDisplayMode();
+                    mu=1;
+                    break;
+            }
+        }
+    }
+}
