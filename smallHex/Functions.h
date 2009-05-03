@@ -96,11 +96,11 @@ int FileSize(FILE *file){
     fseek(file,0,SEEK_END);
     return ftell(file);
 }
-void Menu(){
+int Menu(){
     #define MENUX 18
     #define MENUY 5
     const char *mode[3]={"Hex/Char Mode","Only Hex Mode","Only Char Mode"};
-    const char *edit[3]={"Hex Edit","Char Edit","CHAR Edit"};
+    const char *edit[3]={"Hex Edit ","Char Edit","CHAR Edit"};
     const char *menu[2]={"Go to Offset","New File"};
     int cx=(GetBufferSizeX()-MENUX)/2;
     int cy=(GetBufferSizeY()-MENUY)/2-3;
@@ -112,15 +112,25 @@ REMENU:
         SetXY(cx+3,cy+3+i); printf("%s",menu[i]);
     }
     SetXY(cx+1,cy+GetMenuOption()); printf(">");
-    while(!(Key(ESC))&&!(Key(CTRLSX))&&!(Key(CTRLDX))&&!mu){
+    //mu=0;
+    while(!(Key(ESC))&&!(Key(CTRLSX))&&!(Key(CTRLDX))){
         Sleep(1);
         MenuCycle(cx+1,cy,MENUY-1);
         if (Key(RETURN)){
             switch(GetMenuOption()){
                 case 1:
-                    ChangeDisplayMode();
-                    mu=1;
-                    break;
+                    return 1;
+                case 2:
+                    if (!md) md=1;
+                    else if (!up) up=1;
+                    else {
+                        up=0;
+                        md=0;
+                    }
+                    ConsoleX(3);
+                    goto REMENU;
+                case 4:
+                    return 4;
             }
         }
     }

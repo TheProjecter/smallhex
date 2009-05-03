@@ -15,8 +15,8 @@ int main(){
     char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
     char *path;
-    cls();
 OPEN:
+    cls();
     #ifdef DEBUG
         path="test.bin";
     #else
@@ -38,8 +38,8 @@ OPEN:
     register byte ky=0;
 SWITCH:
     COORD conbuf={GetBufferSizeX(),GetBufferSizeY()};
-    cls();
     DrawLineX(1,conbuf.Y-2,conbuf.X-2);
+    cls();
     ConsoleX(0xFF);
     for(int i=0;i<2048;i++) scrbuf[i]=0;
 READ:
@@ -134,10 +134,7 @@ UPDATE:
     SetTextColor(DWHITE);
 WHILEEX:
     ky=0;
-    if (mu){
-        mu=0;
-        Menu();
-    }
+    if (mu) Menu();
     while(1){
 NOFOCUS:
         Sleep(1);
@@ -256,8 +253,21 @@ NOFOCUS:
             case BACKSPC:
                 kh=!kh;
                 break;
-            case F5:
+            case F1:
+                cls();
+                DrawLineX(1,conbuf.Y-2,conbuf.X-2);
+                ConsoleX(0xFF);
+                SetXY(0,2);
+                printf("    F1   Help\n",
+                       "    F2   Change Display Mode"
+                       "   TAB   Switch Input Mode",
+                       "   ESC   Close smallHex"
+                       );
+                Pause(ESC);
+                break;
+            case F2:
                 ChangeDisplayMode();
+                mu=1;
                 goto SWITCH;
             case F12:
                 goto OPEN;
@@ -283,8 +293,14 @@ NOFOCUS:
                 goto READ;
             case CTRLDX:
             case CTRLSX:
-                Menu();
-                goto SWITCH;
+                switch(Menu()){
+                    case 1:
+                        ChangeDisplayMode();
+                        //mu=1;
+                        goto SWITCH;
+                    case 4:
+                        goto OPEN;
+                }
             case ESC:
                 fclose(file);
                 cls();
