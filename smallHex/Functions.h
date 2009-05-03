@@ -7,7 +7,7 @@
 #define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0,md=0,up=0,xd=1,mu=0,focus;
+bool kh=0,md=0,up=0,xd=1,focus;
 int32 p=0,size,divid;
 byte displaymode=0;
 byte bufX=19,bufY=23,
@@ -112,8 +112,7 @@ REMENU:
         SetXY(cx+3,cy+3+i); printf("%s",menu[i]);
     }
     SetXY(cx+1,cy+GetMenuOption()); printf(">");
-    //mu=0;
-    while(!(Key(ESC))&&!(Key(CTRLSX))&&!(Key(CTRLDX))){
+    while(1){
         Sleep(1);
         MenuCycle(cx+1,cy,MENUY-1);
         if (Key(RETURN)){
@@ -133,5 +132,6 @@ REMENU:
                     return 4;
             }
         }
+        else if (Key(CTRLSX)||Key(CTRLDX)) return 0;
     }
 }

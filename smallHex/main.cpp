@@ -11,11 +11,13 @@ int main(){
     SetBufferSizeY(25);
     DWORD dwThreadId, dwThrdParam = 1;
     HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
+    bool mu=0;
     byte *buf=(byte*)malloc(4096);
     char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
     char *path;
 OPEN:
+    p=0;
     cls();
     #ifdef DEBUG
         path="test.bin";
@@ -37,9 +39,9 @@ OPEN:
     size=FileSize(file)-1;
     register byte ky=0;
 SWITCH:
+    cls();
     COORD conbuf={GetBufferSizeX(),GetBufferSizeY()};
     DrawLineX(1,conbuf.Y-2,conbuf.X-2);
-    cls();
     ConsoleX(0xFF);
     for(int i=0;i<2048;i++) scrbuf[i]=0;
 READ:
@@ -108,8 +110,8 @@ WRITE:
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
-        if (!md) SetTextColor(LRED);{
-
+        if (!md){
+            SetTextColor(LRED);
             if (0){ // NEW HEXEDIT SYSTEM, BUT I DON'T LIKE IT. For activate, replace 0 with 1
                 SetXY(posXH+kh,0);
                 if (!kh) printf("%X",buf[0]>>4);
@@ -134,7 +136,20 @@ UPDATE:
     SetTextColor(DWHITE);
 WHILEEX:
     ky=0;
-    if (mu) Menu();
+    if (mu){
+MENU:
+        mu=0;
+        switch(Menu()){
+            case 0:
+                goto READ;
+            case 1:
+                ChangeDisplayMode();
+                mu=1;
+                goto SWITCH;
+            case 4:
+                goto OPEN;
+        }
+    }
     while(1){
 NOFOCUS:
         Sleep(1);
@@ -253,6 +268,7 @@ NOFOCUS:
             case BACKSPC:
                 kh=!kh;
                 break;
+#ifdef DEBUG
             case F1:
                 cls();
                 DrawLineX(1,conbuf.Y-2,conbuf.X-2);
@@ -263,11 +279,15 @@ NOFOCUS:
                        "   TAB   Switch Input Mode",
                        "   ESC   Close smallHex"
                        );
-                Pause(ESC);
+                fclose(file);
+                cls();
+                free(scrbuf);
+                MessageBox(NULL,"Function not implemented","smallHex",MB_OK|MB_ICONERROR|MB_TOPMOST);
+                exit(-1);
                 break;
+#endif
             case F2:
                 ChangeDisplayMode();
-                mu=1;
                 goto SWITCH;
             case F12:
                 goto OPEN;
@@ -293,14 +313,7 @@ NOFOCUS:
                 goto READ;
             case CTRLDX:
             case CTRLSX:
-                switch(Menu()){
-                    case 1:
-                        ChangeDisplayMode();
-                        //mu=1;
-                        goto SWITCH;
-                    case 4:
-                        goto OPEN;
-                }
+                goto MENU;
             case ESC:
                 fclose(file);
                 cls();
