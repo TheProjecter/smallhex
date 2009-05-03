@@ -11,7 +11,7 @@ int main(){
     SetBufferSizeY(25);
     DWORD dwThreadId, dwThrdParam = 1;
     HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
-    bool mu=0;
+    bool mu=0; int px;
     byte *buf=(byte*)malloc(4096);
     char *scrbuf=(char*)malloc(2048);
     char hexbuf[2];
@@ -45,9 +45,9 @@ SWITCH:
     ConsoleX(0xFF);
     for(int i=0;i<2048;i++) scrbuf[i]=0;
 READ:
-    ConsoleX(1);
     fseek(file,p,SEEK_SET);
     fread(buf,1,4096,file);
+    ConsoleX(1);
     SetXY(0,0);
     for(int y=0;y<bufY;y++){
         scrbuf[0+conbuf.X*y]=0x20;
@@ -110,8 +110,8 @@ WRITE:
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
+        SetTextColor(LRED);
         if (!md){
-            SetTextColor(LRED);
             if (0){ // NEW HEXEDIT SYSTEM, BUT I DON'T LIKE IT. For activate, replace 0 with 1
                 SetXY(posXH+kh,0);
                 if (!kh) printf("%X",buf[0]>>4);
@@ -146,6 +146,25 @@ MENU:
                 ChangeDisplayMode();
                 mu=1;
                 goto SWITCH;
+            case 3:
+                ConsoleX(4);
+                register byte k;
+                px=0;
+                while(1){
+                    Sleep(1);
+                    k=HexInput();
+                    if (k<0x10&&px<0x10000000){
+                        px=(px<<4)+k;
+                        SetXY(11,24); printf("Offset %X",px);
+                    }
+                    else if (Key(RETURN)){
+                        if (px<=size){
+                            p=px;
+                        }
+                        else ConsoleX(5);
+                        goto READ;
+                    }
+                }
             case 4:
                 goto OPEN;
         }
