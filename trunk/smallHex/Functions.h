@@ -149,8 +149,8 @@ REMENU:
     }
 }
 void Help(){
-    #define HELP 6
-    const char *help[HELP]={" F1   Help"," F2   Change Display Mode"," F3   Go to Offset"," ","TAB   Switch Input Mode","ESC   Close smallHex"};
+    #define HELP 7
+    const char *help[HELP]={" F1   Help"," F2   Change Display Mode"," F3   Go to Offset"," F4   Undo"," ","TAB   Switch Input Mode","ESC   Close smallHex"};
     for(int i=0;i<HELP;i++){
         SetXY(3,1+i); printf("%s",help[i]);
     }
