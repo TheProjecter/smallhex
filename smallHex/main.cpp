@@ -14,6 +14,9 @@ int main(){
     bool mu=0; int px;
     byte *buf=(byte*)malloc(4096);
     char *scrbuf=(char*)malloc(2048);
+    byte *pB=(byte*)malloc(4096);
+    int  *pO=(int *)malloc(4096);
+    int pP=0;
     char hexbuf[2];
     char *path;
 OPEN:
@@ -91,6 +94,9 @@ NULLCHAR:
     printf("%s",scrbuf);
     if (0){
 WRITE:
+        pB[pP]=buf[0];
+        pO[pP]=p;
+        pP++;
         if (!md){
             if (!kh)
                 buf[0]=buf[0]-((buf[0]>>4)<<4)+(ky<<4);
@@ -102,6 +108,7 @@ WRITE:
             if (up) buf[0]=ky;
             else buf[0]=ky+0x20;
         }
+UNDO:
         write(buf[0]);
         if (md){
             p++;
@@ -147,6 +154,7 @@ MENU:
                 mu=1;
                 goto SWITCH;
             case 3:
+GOTOOFFSET:
                 ConsoleX(4);
                 register byte k;
                 px=0;
@@ -301,6 +309,16 @@ NOFOCUS:
             case F2:
                 ChangeDisplayMode();
                 goto SWITCH;
+            case F3:
+                goto GOTOOFFSET;
+            case F4:
+                if (pP>0){
+                    pP--;
+                    p=pO[pP];
+                    buf[0]=pB[pP];
+                    goto UNDO;
+                }
+                break;
             case F12:
                 goto OPEN;
             case TAB:
