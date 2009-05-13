@@ -7,7 +7,7 @@
 #define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0,md=0,up=0,xd=1,focus;
+bool kh=0,md=0,up=0,xd=1,patch=1,focus;
 int32 p=0,size,divid;
 byte displaymode=0;
 byte bufX=19,bufY=23,
@@ -33,7 +33,7 @@ void ConsoleX(byte t){
     switch (t){
         case 0:
 INFO:
-            SetXY(66,24);
+            SetXY(65,24);
             divid=1;
             for(divid=1;divid*1024<size;divid*=1024) if(divid>1073741823) break;
             printf("[ %4u",size/divid);
@@ -41,9 +41,11 @@ INFO:
             else if (divid<(1<<20)) printf("KB");
             else if (divid<(1<<30)) printf("MB");
             else printf("GB");
-            if (!md) printf(" H ]");
-            else if (!up) printf(" c ]");
-            else printf(" C ]");
+            if (patch) printf(" P");
+            else printf("  ");
+            if (!md) printf("H ]");
+            else if (!up) printf("c ]");
+            else printf("C ]");
             break;
         case 1:
             printf("Reading to Offset: %08X/%08X",p,size);
@@ -60,6 +62,14 @@ INFO:
             break;
         case 5:
             printf("Error: The offset is too big...     ");
+            Sleep(1000);
+            break;
+        case 6:
+            printf("Patch Mode changed                  ");
+            goto INFO;
+            break;
+        case 7:
+            printf("Patch Created :D                    ");
             Sleep(1000);
             break;
         case 0xFF:
@@ -113,17 +123,17 @@ int FileSize(FILE *file){
 }
 int Menu(){
     #define MENUX 18
-    #define MENUY 5
+    #define MENUY 6
     const char *mode[3]={"Hex/Char Mode","Only Hex Mode","Only Char Mode"};
     const char *edit[3]={"Hex Edit ","Char Edit","CHAR Edit"};
-    const char *menu[2]={"Go to Offset","New File"};
+    const char *menu[3]={"Go to Offset","Create Patch","New File"};
     int cx=(GetBufferSizeX()-MENUX)/2;
     int cy=(GetBufferSizeY()-MENUY)/2-3;
     FillDRect(cx,cy,MENUX,MENUY);
 REMENU:
     SetXY(cx+3,cy+1); printf("%s",mode[displaymode]);
     SetXY(cx+3,cy+2); printf("%s",edit[md+up]);
-    for(int i=0;i<2;i++){
+    for(int i=0;i<MENUY-3;i++){
         SetXY(cx+3,cy+3+i); printf("%s",menu[i]);
     }
     SetXY(cx+1,cy+GetMenuOption()); printf(">");
@@ -149,8 +159,8 @@ REMENU:
     }
 }
 void Help(){
-    #define HELP 7
-    const char *help[HELP]={" F1   Help"," F2   Change Display Mode"," F3   Go to Offset"," F4   Undo"," ","TAB   Switch Input Mode","ESC   Close smallHex"};
+    #define HELP 8
+    const char *help[HELP]={" F1   Help"," F2   Undo"," F3   Go to Offset"," F4   Change Display Mode"," F5   Patch Mode"," ","TAB   Switch Input Mode","ESC   Close smallHex"};
     for(int i=0;i<HELP;i++){
         SetXY(3,1+i); printf("%s",help[i]);
     }

@@ -12,11 +12,12 @@ int main(){
     DWORD dwThreadId, dwThrdParam = 1;
     HANDLE thFocus = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)FocusThread,&dwThrdParam,0,&dwThreadId);
     bool mu=0; int px;
-    byte *buf=(byte*)malloc(4096);
-    char *scrbuf=(char*)malloc(2048);
-    byte *pB=(byte*)malloc(4096);
-    int  *pO=(int *)malloc(4096);
-    int pP=0;
+    byte *buf=(byte*)malloc(2048);
+    char *scrbuf=(char*)malloc(80*25);
+    byte *pB=(byte*)malloc(0x7FFF);
+    byte *pX=(byte*)malloc(0x7FFF);
+    int  *pO=(int *)malloc(0x7FFF);
+    int pP=0,pY=0;
     char hexbuf[2];
     char *path;
 OPEN:
@@ -49,7 +50,7 @@ SWITCH:
     for(int i=0;i<2048;i++) scrbuf[i]=0;
 READ:
     fseek(file,p,SEEK_SET);
-    fread(buf,1,4096,file);
+    fread(buf,1,2048,file);
     ConsoleX(1);
     SetXY(0,0);
     for(int y=0;y<bufY;y++){
@@ -107,6 +108,18 @@ WRITE:
         else {
             if (up) buf[0]=ky;
             else buf[0]=ky+0x20;
+        }
+        if (patch){
+            bool z=0;
+            for(int i=0;i<pP;i++)
+                if (pO[i]==p){
+                    pX[i]=buf[0];
+                    z=1;
+                }
+            if (!z){
+                pX[pY]=buf[0];
+                pY++;
+            }
         }
 UNDO:
         write(buf[0]);
@@ -179,6 +192,15 @@ OFFSET:
                     }
                 }
             case 4:
+                FILE *patch=fopen("test.shpatch","w+b");
+                fwrite(pO,1,pY,patch);
+                fwrite(pX,1,pY,patch);
+                fclose(patch);
+                ConsoleX(7);
+                pX=0;
+                pY=0;
+                goto OPEN;
+            case 5:
                 goto OPEN;
         }
     }
@@ -187,7 +209,7 @@ NOFOCUS:
         Sleep(1);
         if (!focus) goto NOFOCUS;
 
-        for(register int i=8;i<0xA6;i++)
+        for(register int i=/*8*/1;i<0xA6;i++)
             if(Key(i)) ky=i;
 
         switch(ky){
@@ -307,11 +329,6 @@ NOFOCUS:
                 DrawLineX(1,conbuf.Y-2,conbuf.X-2);
                 break;
             case F2:
-                ChangeDisplayMode();
-                goto SWITCH;
-            case F3:
-                goto GOTOOFFSET;
-            case F4:
                 if (pP>0){
                     pP--;
                     p=pO[pP];
@@ -319,6 +336,14 @@ NOFOCUS:
                     goto UNDO;
                 }
                 break;
+            case F3:
+                goto GOTOOFFSET;
+            case F4:
+                ChangeDisplayMode();
+                goto SWITCH;
+            case F5:
+                patch=1;
+                ConsoleX(6);
             case F12:
                 goto OPEN;
             case TAB:
@@ -347,8 +372,19 @@ NOFOCUS:
             case ESC:
                 fclose(file);
                 cls();
+                free(buf);
                 free(scrbuf);
+                free(pB);
+                free(pO);
                 exit(0);
+            case 4:
+                cls();
+                SetY(24); printf("OBJECTS: %i",pY);
+                SetXY(0,0);
+                for (int i=0;i<pY;i++)
+                    printf("> %08X - %02X\n",pO[pY],pX[pY]);
+                Sleep(1000);
+                break;
         }
     }
 }
