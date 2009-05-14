@@ -49,7 +49,6 @@ INFO:
             break;
         case 1:
             printf("Reading to Offset: %08X/%08X",p,size);
-            kh=0;
             break;
         case 2:
             printf("Writing to Offset: %08X/%08X",p,size);
