@@ -109,9 +109,11 @@ WRITE:
             if (up) buf[0]=ky;
             else buf[0]=ky+0x20;
         }
+#ifdef DEBUG
         if (patch){
+            SetXY(0,24); printf("%04i",pY);
             bool z=0;
-            for(int i=0;i<pP;i++)
+            for(int i=0;i<pY;i++)
                 if (pO[i]==p){
                     pX[i]=buf[0];
                     z=1;
@@ -121,18 +123,21 @@ WRITE:
                 pY++;
             }
         }
-UNDO:
+#endif
         write(buf[0]);
-        if (md){
-            p++;
-            goto READ;
+        if (md) p++;
+        else if (!kh) p++;
+        if (0){
+UNDO:
+            write(buf[0]);
         }
+        goto READ;
     }
 UPDATE:
     if (displaymode==0||displaymode==1){
         SetTextColor(LRED);
         if (!md){
-            if (0){ // NEW HEXEDIT SYSTEM, BUT I DON'T LIKE IT. For activate, replace 0 with 1
+            if (1){ // NEW HEXEDIT SYSTEM ACTIVATED!! ;)
                 SetXY(posXH+kh,0);
                 if (!kh) printf("%X",buf[0]>>4);
                 else printf("%X",buf[0]-(buf[0]>>4<<4));
@@ -377,14 +382,16 @@ NOFOCUS:
                 free(pB);
                 free(pO);
                 exit(0);
+#ifdef debug
             case 4:
                 cls();
                 SetY(24); printf("OBJECTS: %i",pY);
                 SetXY(0,0);
                 for (int i=0;i<pY;i++)
-                    printf("> %08X - %02X\n",pO[pY],pX[pY]);
+                    printf("> %08X - %02X\n",pO[i],pX[i]);
                 Sleep(1000);
                 break;
+#endif
         }
     }
 }
