@@ -7,7 +7,7 @@
 #define KeyA(i) GetAsyncKeyState(i)
 #define Key(i) GetAsyncKeyState(i)==-32767
 
-bool kh=0,md=0,up=0,xd=1,patch=1,focus;
+bool kh=0,md=0,up=0,xd=1,patch=0,focus;
 int32 p=0,size,divid;
 byte displaymode=0;
 byte bufX=19,bufY=23,
